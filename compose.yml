@@ -1,0 +1,112 @@
+services:
+  front-end-debug:
+    build:
+      context: ./front_end
+      dockerfile: debug.Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - ./front_end:/front_end
+      - /front_end/node_modules
+    depends_on:
+      - back-end-debug
+    networks:
+      - internal
+
+  front-end-build:
+    build:
+      context: ./front_end
+      dockerfile: build.Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - back-end-build
+    networks:
+      - internal
+
+  back-end-debug:
+    container_name: backend
+    build:
+      context: ./back_end
+      dockerfile: debug.Dockerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - type: bind
+        source: ./back_end
+        target: /back_end
+    depends_on:
+      - database
+      - another-service-build
+    networks:
+      - internal
+    env_file:
+      - .env
+
+  back-end-build:
+    container_name: backend
+    build:
+      context: ./back_end
+      dockerfile: build.Dockerfile
+    ports:
+      - 5000:5000
+      - 5001:5001
+    restart: on-failure
+    depends_on:
+      - database
+      - parquet
+      - another-service-build
+    networks:
+      - internal
+    env_file:
+      - .env
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 50M
+
+  another-service-build:
+    container_name: another-service
+    build:
+      context: ./another-service
+      dockerfile: build.Dockerfile
+    ports:
+      - 9000:9000
+    restart: on-failure
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '0.05'
+          memory: 50M
+
+  database:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./dummy-data-volume:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
+    networks:
+      - internal
+
+  parquet:
+    image: mishmashio/opentelemetry-parquet-server:1.0.0
+    container_name: parquet
+    volumes:
+      - ./parquet:/parquet
+    networks:
+      - internal
+    ports:
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+
+networks:
+  internal:
+    driver: bridge

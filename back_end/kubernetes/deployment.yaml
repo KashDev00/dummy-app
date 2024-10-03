@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dummy-backend
+  labels:
+    app: dummy-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dummy-backend
+  template:
+    metadata:
+      name: dummy-backend
+      labels:
+        app: dummy-backend
+    spec:
+      containers:
+        - name: dummy-backend
+          image: dummy-backend:latest
+          imagePullPolicy:  Never
+          envFrom:
+            - configMapRef:
+                name: postgres-secret
+      restartPolicy: Always
+      

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: another-service
+  labels:
+    app: another-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: another-service
+  template:
+    metadata:
+      name: another-service
+      labels:
+        app: another-service
+    spec:
+      containers:
+        - name: another-service
+          image: another-service:latest
+          imagePullPolicy:  Never
+      restartPolicy: Always
+      

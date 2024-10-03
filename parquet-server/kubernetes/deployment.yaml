@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parquet
+  labels:
+    app: parquet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parquet
+  template:
+    metadata:
+      name: parquet
+      labels:
+        app: parquet
+    spec:
+      containers:
+        - name: parquet
+          image: mishmashio/opentelemetry-parquet-server:1.0.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4317
+            - containerPort: 4318
+          volumeMounts:
+            - mountPath: /parquet
+              name: parquet-data
+      restartPolicy: Always
+      volumes:
+        - name: parquet-data
+          persistentVolumeClaim:
+            claimName: parquet-volume-claim
+      
