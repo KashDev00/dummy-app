@@ -6,8 +6,13 @@ jobs:
     steps:
       - name: Welcome
         run: echo "test pushed"
+      
       - name: another step
         run: ls
+
+      - name:  checkout current repo
+        uses: actions/checkout@v7
+        
       - name: third step
         run: cat README.md
     
