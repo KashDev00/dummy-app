@@ -1,0 +1,14 @@
+name: first work flow
+on: push
+jobs:
+  first_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Welcome
+        run: echo "test pushed"
+      - name: another step
+        run: ls
+      - name: third step
+        run: cat README.md
+    
+      
