@@ -1,0 +1,14 @@
+name:  run screen fetch
+on: push
+jobs:
+  screen_fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install screen-fetch 
+        run: sudo apt install -y screenfetch
+      
+      - name: run
+        run: screenfetch >> info.txt
+      
+      - name: view sysinfo
+        run: cat info.txt
